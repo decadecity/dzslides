@@ -26,7 +26,7 @@ var Dz = {
 
 Dz.init = function() {
   document.body.className = "loaded";
-  this.slides = Array.prototype.slice.call($$("body > section"));
+  this.slides = Array.prototype.slice.call($$(".slides > section"));
   this.progressBar = $("#progress-bar");
   this.html = document.body.parentNode;
   this.setupParams();
@@ -150,7 +150,7 @@ Dz.onresize = function() {
 
 Dz.getNotes = function(aIdx) {
   var s = $("section:nth-of-type(" + aIdx + ")");
-  var d = s.$("[role='note']");
+  var d = s.$(".notes");
   return d ? d.innerHTML : "";
 }
 
@@ -357,6 +357,10 @@ Dz.postMsg = function(aWin, aMsg) { // [arg0, [arg1...]]
 }
 
 function init() {
+  $$.forEach($$('[data-markdown]'), function(el) {
+    el.innerHTML = markdown.toHTML(el.innerHTML);
+    el.removeAttribute('data-markdown');
+  });
   Dz.init();
   window.onkeydown = Dz.onkeydown.bind(Dz);
   window.onresize = Dz.onresize.bind(Dz);
