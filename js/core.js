@@ -147,16 +147,21 @@ Dz.onresize = function() {
   db.style.transform = transform;
 }
 
+Dz.getCurrentSlide = function() {
+  return $(".slides > section[aria-selected]");
+};
 
 Dz.getNotes = function(aIdx) {
-  var s = $("section:nth-of-type(" + aIdx + ")");
+  var s = $(".slides > section:nth-of-type(" + aIdx + ")");
   var d = s.$(".notes");
   return d ? d.innerHTML : "";
 }
 
 Dz.onmessage = function(aEvent) {
   var argv = aEvent.data.split(" "), argc = argv.length;
-  argv.forEach(function(e, i, a) { a[i] = decodeURIComponent(e) });
+  argv.forEach(function(e, i, a) {
+    a[i] = decodeURIComponent(e)
+  });
   var win = aEvent.source;
   if (argv[0] === "REGISTER" && argc === 1) {
     this.remoteWindows.push(win);
@@ -164,22 +169,30 @@ Dz.onmessage = function(aEvent) {
     this.postMsg(win, "CURSOR", this.idx + "." + this.step);
     return;
   }
-  if (argv[0] === "BACK" && argc === 1)
+  if (argv[0] === "BACK" && argc === 1) {
     this.back();
-  if (argv[0] === "FORWARD" && argc === 1)
+  }
+  if (argv[0] === "FORWARD" && argc === 1) {
     this.forward();
-  if (argv[0] === "START" && argc === 1)
+  }
+  if (argv[0] === "START" && argc === 1) {
     this.goStart();
-  if (argv[0] === "END" && argc === 1)
+  }
+  if (argv[0] === "END" && argc === 1) {
     this.goEnd();
-  if (argv[0] === "TOGGLE_CONTENT" && argc === 1)
+  }
+  if (argv[0] === "TOGGLE_CONTENT" && argc === 1) {
     this.toggleContent();
-  if (argv[0] === "SET_CURSOR" && argc === 2)
+  }
+  if (argv[0] === "SET_CURSOR" && argc === 2) {
     window.location.hash = "#" + argv[1];
-  if (argv[0] === "GET_CURSOR" && argc === 1)
+  }
+  if (argv[0] === "GET_CURSOR" && argc === 1) {
     this.postMsg(win, "CURSOR", this.idx + "." + this.step);
-  if (argv[0] === "GET_NOTES" && argc === 1)
+  }
+  if (argv[0] === "GET_NOTES" && argc === 1) {
     this.postMsg(win, "NOTES", this.getNotes(this.idx));
+  }
 }
 
 Dz.toggleContent = function() {
@@ -212,7 +225,7 @@ Dz.onhashchange = function() {
   if (cursor.length == 2) {
     newidx = ~~cursor[1].split(".")[0];
     newstep = ~~cursor[1].split(".")[1];
-    if (newstep > Dz.slides[newidx - 1].$$('.incremental > *').length) {
+    if (newstep > Dz.slides[newidx - 1].$$('.fragment').length) {
       newstep = 0;
       newidx++;
     }
@@ -235,7 +248,7 @@ Dz.back = function() {
   }
   if (this.step == 0) {
     this.setCursor(this.idx - 1,
-                   this.slides[this.idx - 2].$$('.incremental > *').length);
+                   this.slides[this.idx - 2].$$('.fragment').length);
   } else {
     this.setCursor(this.idx, this.step - 1);
   }
@@ -243,10 +256,10 @@ Dz.back = function() {
 
 Dz.forward = function() {
   if (this.idx >= this.slides.length &&
-      this.step >= this.slides[this.idx - 1].$$('.incremental > *').length) {
+      this.step >= this.slides[this.idx - 1].$$('.fragment').length) {
       return;
   }
-  if (this.step >= this.slides[this.idx - 1].$$('.incremental > *').length) {
+  if (this.step >= this.slides[this.idx - 1].$$('.fragment').length) {
     this.setCursor(this.idx + 1, 0);
   } else {
     this.setCursor(this.idx, this.step + 1);
@@ -259,7 +272,7 @@ Dz.goStart = function() {
 
 Dz.goEnd = function() {
   var lastIdx = this.slides.length;
-  var lastStep = this.slides[lastIdx - 1].$$('.incremental > *').length;
+  var lastStep = this.slides[lastIdx - 1].$$('.fragment').length;
   this.setCursor(lastIdx, lastStep);
 }
 
@@ -296,34 +309,38 @@ Dz.setSlide = function(aIdx) {
     this.idx = -1;
     // console.warn("Slide doesn't exist.");
   }
+  this.postMsg(window, 'SLIDE_CHANGE');
 }
 
 Dz.setIncremental = function(aStep) {
   this.step = aStep;
-  var old = this.slides[this.idx - 1].$('.incremental > *[aria-selected]');
+  var old = this.slides[this.idx - 1].$('.fragment[aria-selected]');
   if (old) {
     old.removeAttribute('aria-selected');
   }
-  var incrementals = $$('.incremental');
+  var incrementals = $$('.fragment');
   if (this.step <= 0) {
     $$.forEach(incrementals, function(aNode) {
       aNode.removeAttribute('active');
     });
     return;
   }
-  var next = this.slides[this.idx - 1].$$('.incremental > *')[this.step - 1];
+  var next = this.slides[this.idx - 1].$$('.fragment')[this.step - 1];
   if (next) {
     next.setAttribute('aria-selected', true);
     next.parentNode.setAttribute('active', true);
     var found = false;
     $$.forEach(incrementals, function(aNode) {
-      if (aNode != next.parentNode)
-        if (found)
+      if (aNode != next.parentNode) {
+        if (found) {
           aNode.removeAttribute('active');
-        else
+        }
+        else {
           aNode.setAttribute('active', true);
-      else
+        }
+      } else {
         found = true;
+      }
     });
   } else {
     setCursor(this.idx, 0);
@@ -343,7 +360,7 @@ Dz.setProgress = function(aIdx, aStep) {
   var slide = $("section:nth-of-type("+ aIdx +")");
   if (!slide)
     return;
-  var steps = slide.$$('.incremental > *').length + 1,
+  var steps = slide.$$('.fragment').length + 1,
       slideSize = 100 / (this.slides.length - 1),
       stepSize = slideSize / steps;
   this.progressBar.style.width = ((aIdx - 1) * slideSize + aStep * stepSize) + '%';
@@ -351,8 +368,9 @@ Dz.setProgress = function(aIdx, aStep) {
 
 Dz.postMsg = function(aWin, aMsg) { // [arg0, [arg1...]]
   aMsg = [aMsg];
-  for (var i = 2; i < arguments.length; i++)
+  for (var i = 2; i < arguments.length; i++) {
     aMsg.push(encodeURIComponent(arguments[i]));
+  }
   aWin.postMessage(aMsg.join(" "), "*");
 }
 
