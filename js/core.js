@@ -34,6 +34,7 @@ Dz.init = function() {
   this.setupTouchEvents();
   this.onresize();
   this.setupView();
+  this.sortAllFragments();
 }
 
 Dz.setupParams = function() {
@@ -321,7 +322,7 @@ Dz.setSlide = function(aIdx) {
 
 Dz.setIncremental = function(aStep) {
   this.step = aStep;
-  navigateFragment(aStep - 1);
+  Dz.navigateFragment(aStep - 1);
 }
 
 Dz.goFullscreen = function() {
@@ -352,7 +353,9 @@ Dz.postMsg = function(win, message) { // [arg0, [arg1...]]
 }
 
 Dz.sendEvent = function(type, data) {
-  var event = new CustomEvent(type, data);
+  var event = new CustomEvent(type, {
+    detail: data
+  });
   document.dispatchEvent(event);
 };
 

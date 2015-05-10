@@ -1,19 +1,12 @@
 /**
- * Converts the target object to an array.
- */
-function toArray(target) {
-  return Array.prototype.slice.call(target);
-}
-
-/**
  * Sorts and formats all of fragments in the
  * presentation.
  */
-function sortAllFragments() {
+Dz.sortAllFragments = function() {
 
-  var slides = toArray(document.querySelectorAll('section'));
-  slides.forEach(function(slide) {
-    sortFragments(slide.querySelectorAll('.fragment'));
+  var slides = $('section');
+  slides.each(function() {
+    Dz.sortFragments($(this).find('.fragment'));
   });
 
 }
@@ -32,18 +25,19 @@ function sortAllFragments() {
  * and sets that attribute to an integer value which is the position of
  * the fragment within the fragments list.
  */
-function sortFragments(fragments) {
+Dz.sortFragments = function(fragments) {
 
-  fragments = toArray(fragments);
+  //fragments = toArray(fragments);
 
   var ordered = [],
-    unordered = [],
-    sorted = [];
+      unordered = [],
+      sorted = [];
 
   // Group ordered and unordered elements
-  fragments.forEach(function(fragment, i) {
-    if(fragment.hasAttribute('data-fragment-index')) {
-      var index = parseInt(fragment.getAttribute('data-fragment-index'), 10);
+  fragments.each(function() {
+    var fragment = $(this);
+    if(typeof fragment.data('fragment-index') !== 'undefined') {
+      var index = parseInt(fragment.data('fragment-index'), 10);
 
       if(!ordered[index]) {
         ordered[index] = [];
@@ -69,14 +63,14 @@ function sortFragments(fragments) {
   ordered.forEach(function(group) {
     group.forEach(function(fragment) {
       sorted.push(fragment);
-      fragment.setAttribute('data-fragment-index', index);
+      fragment.data('fragment-index', index);
     });
     index ++;
   });
 
   return sorted;
 
-}
+};
 
 /**
  * Navigate to the specified slide fragment.
@@ -89,21 +83,24 @@ function sortFragments(fragments) {
  * @return {Boolean} true if a change was made in any
  * fragments visibility as part of this call
  */
-function navigateFragment( index, offset ) {
+Dz.navigateFragment = function(index, offset) {
+  index = parseInt(index, 10);
+  if (isNaN(index)) {
+    index = null;
+  }
 
-  var currentSlide = Dz.getCurrentSlide();
+  var current_slide = Dz.getCurrentSlide();
 
-  if( currentSlide) {
+  if(current_slide.length) {
 
-    var fragments = sortFragments( currentSlide.find( '.fragment' ) );
-    if( fragments.length ) {
+    var fragments = Dz.sortFragments(current_slide.find('.fragment'));
+    if(fragments.length) {
 
       // If no index is specified, find the current
-      if( typeof index !== 'number' ) {
-        var lastVisibleFragment = sortFragments( currentSlide.find( '.fragment.visible' ) ).pop();
-
-        if( lastVisibleFragment ) {
-          index = parseInt( lastVisibleFragment.data( 'fragment-index' ) || 0, 10 );
+      if(typeof index !== 'number') {
+        var last_visisble_fragment = sortFragments(current_slide.find('.fragment.visible')).pop();
+        if(last_visisble_fragment) {
+          index = parseInt(last_visisble_fragment.data('fragment-index') || 0, 10 );
         }
         else {
           index = -1;
@@ -111,51 +108,59 @@ function navigateFragment( index, offset ) {
       }
 
       // If an offset is specified, apply it to the index
-      if( typeof offset === 'number' ) {
+      if(typeof offset === 'number') {
         index += offset;
       }
 
-      var fragmentsShown = [],
-        fragmentsHidden = [];
+      var fragments_shown = [],
+          fragments_hidden = [];
 
-      toArray( fragments ).forEach( function( fragment, i ) {
+      fragments.forEach(function(fragment, i) {
+        var fragment = $(fragment);
 
-        if( fragment.hasAttribute( 'data-fragment-index' ) ) {
-          i = parseInt( fragment.getAttribute( 'data-fragment-index' ), 10 );
+        if(typeof fragment.data('fragment-index') !== 'undefined') {
+          i = parseInt(fragment.data('fragment-index'), 10);
         }
 
         // Visible fragments
-        if( i <= index ) {
-          if( !fragment.classList.contains( 'visible' ) ) fragmentsShown.push( fragment );
-          fragment.classList.add( 'visible' );
-          fragment.classList.remove( 'current-fragment' );
+        if (i <= index) {
+          if (!fragment.hasClass('visible')) {
+            fragments_shown.push(fragment);
+          }
+          fragment.addClass('visible');
+          fragment.removeClass('current-fragment');
 
-          // Announce the fragments one by one to the Screen Reader
-          //dom.statusDiv.textContent = element.textContent;
-
-          if( i === index ) {
-            fragment.classList.add( 'current-fragment' );
+          if (i === index) {
+            fragment.addClass('current-fragment');
           }
         }
         // Hidden fragments
         else {
-          if( fragment.classList.contains( 'visible' ) ) fragmentsHidden.push( fragment );
-          fragment.classList.remove( 'visible' );
-          fragment.classList.remove( 'current-fragment' );
+          if (fragment.hasClass('visible')) {
+            fragments_hidden.push(fragment);
+          }
+          fragment.removeClass('visible');
+          fragment.removeClass('current-fragment');
         }
 
 
       } );
 
-      if( fragmentsHidden.length ) {
-        //dispatchEvent( 'fragmenthidden', { fragment: fragmentsHidden[0], fragments: fragmentsHidden } );
+      if (fragments_hidden.length) {
+        Dz.sendEvent('FRAGMENT_HIDDEN', {
+          fragment: fragments_hidden[0],
+          fragments: fragments_hidden
+        });
       }
 
-      if( fragmentsShown.length ) {
-        //dispatchEvent( 'fragmentshown', { fragment: fragmentsShown[0], fragments: fragmentsShown } );
+      if (fragments_shown.length) {
+        Dz.sendEvent('FRAGMENT_SHOWN', {
+         fragment: fragments_shown[0],
+         fragments: fragments_shown
+       });
       }
 
-      return !!( fragmentsShown.length || fragmentsHidden.length );
+      return !!(fragments_shown.length || fragments_hidden.length);
 
     }
 
@@ -163,7 +168,7 @@ function navigateFragment( index, offset ) {
 
   return false;
 
-}
+};
 
 /**
  * Navigate to the next slide fragment.
@@ -171,7 +176,7 @@ function navigateFragment( index, offset ) {
  * @return {Boolean} true if there was a next fragment,
  * false otherwise
  */
-function nextFragment() {
+Dz.nextFragment = function() {
 
   return navigateFragment( null, 1 );
 
@@ -183,10 +188,9 @@ function nextFragment() {
  * @return {Boolean} true if there was a previous fragment,
  * false otherwise
  */
-function previousFragment() {
+Dz.previousFragment = function() {
 
   return navigateFragment( null, -1 );
 
 }
 
-sortAllFragments();
