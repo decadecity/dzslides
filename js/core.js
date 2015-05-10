@@ -124,8 +124,12 @@ Dz.setupTouchEvents = function() {
 
 Dz.setupView = function() {
   document.body.addEventListener("click", function ( e ) {
-    if (!Dz.html.classList.contains("view")) return;
-    if (!e.target || e.target.nodeName != "SECTION") return;
+    if (!Dz.html.classList.contains("view")) {
+      return;
+    }
+    if (!e.target || e.target.nodeName != "SECTION") {
+      return;
+    }
 
     Dz.html.classList.remove("view");
     Dz.setCursor(Dz.slides.indexOf(e.target) + 1);
@@ -135,20 +139,22 @@ Dz.setupView = function() {
 /* Adapt the size of the slides to the window */
 
 Dz.onresize = function() {
-  var db = document.body;
-  var sx = db.clientWidth / window.innerWidth;
-  var sy = db.clientHeight / window.innerHeight;
-  var transform = "scale(" + (1/Math.max(sx, sy)) + ")";
+  var container = $('#container');
+  var sx = container.offsetWidth / window.innerWidth;
+  var sy = container.offsetHeight / window.innerHeight;
+  var transform = 'scale(' + (1/Math.max(sx, sy)) + ')';
 
-  db.style.MozTransform = transform;
-  db.style.WebkitTransform = transform;
-  db.style.OTransform = transform;
-  db.style.msTransform = transform;
-  db.style.transform = transform;
+  $$.forEach($$('.scaled'), function(el) {
+    el.style.MozTransform = transform;
+    el.style.WebkitTransform = transform;
+    el.style.OTransform = transform;
+    el.style.msTransform = transform;
+    el.style.transform = transform;
+  });
 }
 
 Dz.getCurrentSlide = function() {
-  return $(".slides > section[aria-selected]");
+  return $('.slides > section[aria-selected]');
 };
 
 Dz.getNotes = function(aIdx) {
@@ -309,41 +315,49 @@ Dz.setSlide = function(aIdx) {
     this.idx = -1;
     // console.warn("Slide doesn't exist.");
   }
-  this.postMsg(window, 'SLIDE_CHANGE');
+  Dz.sendEvent('SLIDE_CHANGE');
 }
 
 Dz.setIncremental = function(aStep) {
+  // TODO - badly broken.
   this.step = aStep;
-  var old = this.slides[this.idx - 1].$('.fragment[aria-selected]');
-  if (old) {
-    old.removeAttribute('aria-selected');
+  var previous_fragment = this.slides[this.idx - 1].$('.fragment[aria-selected]');
+  if (previous_fragment) {
+    previous_fragment.removeAttribute('aria-selected');
+    if (previous_fragment.classList.contains('fade-out')) {
+      previous_fragment.classList.add('hidden');
+    }
+    if (previous_fragment.dataset.dcRemove) {
+      previous_fragment.classList.add('removed');
+    }
   }
-  var incrementals = $$('.fragment');
-  if (this.step <= 0) {
-    $$.forEach(incrementals, function(aNode) {
-      aNode.removeAttribute('active');
+  var fragments = $$('.fragment');
+  if (this.step < 0) {
+    $$.forEach(fragments, function(el) {
+      el.removeAttribute('active');
     });
     return;
   }
   var next = this.slides[this.idx - 1].$$('.fragment')[this.step - 1];
   if (next) {
     next.setAttribute('aria-selected', true);
-    next.parentNode.setAttribute('active', true);
+    next.closest('.fragment').setAttribute('active', true);
+    next.classList.remove('hidden');
     var found = false;
-    $$.forEach(incrementals, function(aNode) {
-      if (aNode != next.parentNode) {
+    $$.forEach(fragments, function(el) {
+      if (el != next.parentNode) {
         if (found) {
-          aNode.removeAttribute('active');
+          el.removeAttribute('active');
         }
         else {
-          aNode.setAttribute('active', true);
+          el.setAttribute('active', true);
         }
       } else {
         found = true;
       }
     });
   } else {
-    setCursor(this.idx, 0);
+    Dz.setCursor(this.idx, 0);
   }
   return next;
 }
@@ -358,21 +372,27 @@ Dz.goFullscreen = function() {
 
 Dz.setProgress = function(aIdx, aStep) {
   var slide = $("section:nth-of-type("+ aIdx +")");
-  if (!slide)
+  if (!slide) {
     return;
+  }
   var steps = slide.$$('.fragment').length + 1,
       slideSize = 100 / (this.slides.length - 1),
       stepSize = slideSize / steps;
   this.progressBar.style.width = ((aIdx - 1) * slideSize + aStep * stepSize) + '%';
 }
 
-Dz.postMsg = function(aWin, aMsg) { // [arg0, [arg1...]]
-  aMsg = [aMsg];
+Dz.postMsg = function(win, message) { // [arg0, [arg1...]]
+  message = [message];
   for (var i = 2; i < arguments.length; i++) {
-    aMsg.push(encodeURIComponent(arguments[i]));
+    message.push(encodeURIComponent(arguments[i]));
   }
-  aWin.postMessage(aMsg.join(" "), "*");
+  win.postMessage(message.join(" "), "*");
 }
+
+Dz.sendEvent = function(type, data) {
+  var event = new CustomEvent(type, data);
+  document.dispatchEvent(event);
+};
 
 function init() {
   $$.forEach($$('[data-markdown]'), function(el) {

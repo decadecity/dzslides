@@ -28,7 +28,6 @@ body {
 }
 
 #notes {
-  background: #EEE;
   border-top: 8px solid #555;
   bottom: 0;
   color: #444;
@@ -39,6 +38,12 @@ body {
   position: absolute;
   right: 0;
   overflow: auto;
+  border-color: red;
+  background-color: #F55;
+}
+#notes:focus, #notes:hover {
+  border-color: #555;
+  background: #EEE;
 }
 
 #time {
