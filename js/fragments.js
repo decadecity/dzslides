@@ -4,11 +4,20 @@
  */
 Dz.sortAllFragments = function() {
 
-  var slides = $('section');
+  var slides = Dz.slides;
+  var total_fragments = 0;
   slides.each(function() {
-    Dz.sortFragments($(this).find('.fragment'));
+    var fragments = Dz.sortFragments($(this).find('.fragment'));
+    var last_fragment = fragments[fragments.length - 1];
+    var last_index = 0;
+    if (typeof last_fragment !== 'undefined') {
+      // Here be off by one error.
+      last_index = last_fragment.data('fragment-index') + 1;
+    }
+    $(this).data('dc-fragments', last_index);
+    total_fragments += last_index;
   });
-
+  $('.slides').data('dc-fragments-all', total_fragments);
 }
 
 /**
@@ -26,8 +35,6 @@ Dz.sortAllFragments = function() {
  * the fragment within the fragments list.
  */
 Dz.sortFragments = function(fragments) {
-
-  //fragments = toArray(fragments);
 
   var ordered = [],
       unordered = [],
@@ -65,7 +72,7 @@ Dz.sortFragments = function(fragments) {
       sorted.push(fragment);
       fragment.data('fragment-index', index);
     });
-    index ++;
+    index += 1;
   });
 
   return sorted;

@@ -25,10 +25,10 @@ var Dz = {
 };
 
 Dz.init = function() {
-  document.body.className = "loaded";
-  this.slides = Array.prototype.slice.call($$(".slides > section"));
-  this.progressBar = $("#progress-bar");
-  this.html = document.body.parentNode;
+  $('body').addClass('loaded');
+  this.slides = $('.slides > section');
+  this.progressBar = $('#progress-bar');
+  this.html = $('html')[0];
   this.setupParams();
   this.onhashchange();
   this.setupTouchEvents();
@@ -165,10 +165,13 @@ Dz.getNotes = function(aIdx) {
 }
 
 Dz.onmessage = function(aEvent) {
-  var argv = aEvent.data.split(" "), argc = argv.length;
+  var argv = aEvent.data.split(" "),
+      argc = argv.length;
+
   argv.forEach(function(e, i, a) {
     a[i] = decodeURIComponent(e)
   });
+
   var win = aEvent.source;
   if (argv[0] === "REGISTER" && argc === 1) {
     this.remoteWindows.push(win);
@@ -205,10 +208,10 @@ Dz.onmessage = function(aEvent) {
 Dz.toggleContent = function() {
   // If a Video is present in this new slide, play it.
   // If a Video is present in the previous slide, stop it.
-  var slide = $("section[aria-selected]");
-  if (slide) {
+  var slide = Dz.getCurrentSlide();
+  if (slide.length) {
     var video = slide.find("video");
-    // Don't know if this
+    // Don't know if this works
     if (video) {
       if (video.ended || video.paused) {
         video.play();
@@ -231,9 +234,12 @@ Dz.onhashchange = function() {
       newidx = 1,
       newstep = 0;
   if (cursor.length == 2) {
-    newidx = ~~cursor[1].split(".")[0];
-    newstep = ~~cursor[1].split(".")[1];
-    if (newstep > Dz.slides[newidx - 1].$$('.fragment').length) { // fragment length broken
+    newidx = parseInt(cursor[1].split(".")[0], 10);
+    newstep = parseInt(cursor[1].split(".")[1], 10);
+    console.log(newidx, newstep);
+    var fragments = $(Dz.slides[newidx - 1]).data('dc-fragments');
+    console.log(fragments);
+    if (newstep > fragments) { // fragment length broken
       newstep = 0;
       newidx++;
     }
@@ -255,8 +261,7 @@ Dz.back = function() {
     return;
   }
   if (this.step == 0) {
-    this.setCursor(this.idx - 1,
-                   this.slides[this.idx - 2].$$('.fragment').length); // fragment length broken
+    this.setCursor(this.idx - 1, $(this.slides[this.idx - 2]).data('dc-fragments'));
   } else {
     this.setCursor(this.idx, this.step - 1);
   }
@@ -264,10 +269,10 @@ Dz.back = function() {
 
 Dz.forward = function() {
   if (this.idx >= this.slides.length &&
-      this.step >= this.slides[this.idx - 1].$$('.fragment').length) { // fragment length broken
+      this.step >= $(this.slides[this.idx - 1]).data('dc-fragments')) { // fragment length broken
       return;
   }
-  if (this.step >= this.slides[this.idx - 1].$$('.fragment').length) { // fragment length broken
+  if (this.step >= $(this.slides[this.idx - 1]).data('dc-fragments')) { // fragment length broken
     this.setCursor(this.idx + 1, 0);
   } else {
     this.setCursor(this.idx, this.step + 1);
@@ -280,7 +285,7 @@ Dz.goStart = function() {
 
 Dz.goEnd = function() {
   var lastIdx = this.slides.length;
-  var lastStep = this.slides[lastIdx - 1].$$('.fragment').length; // fragment length broken
+  var lastStep = $(this.slides[this.idx - 1]).data('dc-fragments'); // fragment length broken
   this.setCursor(lastIdx, lastStep);
 }
 
@@ -338,7 +343,7 @@ Dz.setProgress = function(aIdx, aStep) {
   if (!slide) {
     return;
   }
-  var steps = slide.find('.fragment').length + 1, // fragment length broken
+  var steps = slide.data('dc-fragments'), // fragment length broken
       slideSize = 100 / (this.slides.length - 1),
       stepSize = slideSize / steps;
   this.progressBar.css({'width': ((aIdx - 1) * slideSize + aStep * stepSize) + '%'});
