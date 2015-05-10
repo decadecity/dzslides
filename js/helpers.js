@@ -23,9 +23,9 @@ if (!Function.prototype.bind) {
   };
 }
 
-var $ = (HTMLElement.prototype.$ = function(aQuery) {
+/*var $ = (HTMLElement.prototype.$ = function(aQuery) {
   return this.querySelector(aQuery);
-}).bind(document);
+}).bind(document);*/
 
 var $$ = (HTMLElement.prototype.$$ = function(aQuery) {
   return this.querySelectorAll(aQuery);

@@ -95,15 +95,15 @@ function navigateFragment( index, offset ) {
 
   if( currentSlide) {
 
-    var fragments = sortFragments( currentSlide.querySelectorAll( '.fragment' ) );
+    var fragments = sortFragments( currentSlide.find( '.fragment' ) );
     if( fragments.length ) {
 
       // If no index is specified, find the current
       if( typeof index !== 'number' ) {
-        var lastVisibleFragment = sortFragments( currentSlide.querySelectorAll( '.fragment.visible' ) ).pop();
+        var lastVisibleFragment = sortFragments( currentSlide.find( '.fragment.visible' ) ).pop();
 
         if( lastVisibleFragment ) {
-          index = parseInt( lastVisibleFragment.getAttribute( 'data-fragment-index' ) || 0, 10 );
+          index = parseInt( lastVisibleFragment.data( 'fragment-index' ) || 0, 10 );
         }
         else {
           index = -1;

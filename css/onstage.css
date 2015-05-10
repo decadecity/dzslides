@@ -38,11 +38,15 @@ body {
   position: absolute;
   right: 0;
   overflow: auto;
-  border-color: red;
-  background-color: #F55;
+  background: repeating-linear-gradient(
+    -55deg,
+    #FDD,
+    #FDD 20px,
+    #EEE 20px,
+    #EEE 40px
+  );
 }
-#notes:focus, #notes:hover {
-  border-color: #555;
+#notes:focus {
   background: #EEE;
 }
 

@@ -158,9 +158,9 @@ Dz.getCurrentSlide = function() {
 };
 
 Dz.getNotes = function(aIdx) {
-  var s = $(".slides > section:nth-of-type(" + aIdx + ")");
-  var d = s.$(".notes");
-  return d ? d.innerHTML : "";
+  var slides = $('.slides > section:nth-of-type(' + aIdx + ')');
+  var notes = slides.find('.notes');
+  return notes.length ? notes.html() : '';
 }
 
 Dz.onmessage = function(aEvent) {
@@ -204,9 +204,10 @@ Dz.onmessage = function(aEvent) {
 Dz.toggleContent = function() {
   // If a Video is present in this new slide, play it.
   // If a Video is present in the previous slide, stop it.
-  var s = $("section[aria-selected]");
-  if (s) {
-    var video = s.$("video");
+  var slide = $("section[aria-selected]");
+  if (slide) {
+    var video = slide.find("video");
+    // Don't know if this
     if (video) {
       if (video.ended || video.paused) {
         video.play();
@@ -231,7 +232,7 @@ Dz.onhashchange = function() {
   if (cursor.length == 2) {
     newidx = ~~cursor[1].split(".")[0];
     newstep = ~~cursor[1].split(".")[1];
-    if (newstep > Dz.slides[newidx - 1].$$('.fragment').length) {
+    if (newstep > Dz.slides[newidx - 1].$$('.fragment').length) { // fragment length broken
       newstep = 0;
       newidx++;
     }
@@ -254,7 +255,7 @@ Dz.back = function() {
   }
   if (this.step == 0) {
     this.setCursor(this.idx - 1,
-                   this.slides[this.idx - 2].$$('.fragment').length);
+                   this.slides[this.idx - 2].$$('.fragment').length); // fragment length broken
   } else {
     this.setCursor(this.idx, this.step - 1);
   }
@@ -262,10 +263,10 @@ Dz.back = function() {
 
 Dz.forward = function() {
   if (this.idx >= this.slides.length &&
-      this.step >= this.slides[this.idx - 1].$$('.fragment').length) {
+      this.step >= this.slides[this.idx - 1].$$('.fragment').length) { // fragment length broken
       return;
   }
-  if (this.step >= this.slides[this.idx - 1].$$('.fragment').length) {
+  if (this.step >= this.slides[this.idx - 1].$$('.fragment').length) { // fragment length broken
     this.setCursor(this.idx + 1, 0);
   } else {
     this.setCursor(this.idx, this.step + 1);
@@ -278,7 +279,7 @@ Dz.goStart = function() {
 
 Dz.goEnd = function() {
   var lastIdx = this.slides.length;
-  var lastStep = this.slides[lastIdx - 1].$$('.fragment').length;
+  var lastStep = this.slides[lastIdx - 1].$$('.fragment').length; // fragment length broken
   this.setCursor(lastIdx, lastStep);
 }
 
@@ -286,7 +287,7 @@ Dz.toggleView = function() {
   this.html.classList.toggle("view");
 
   if (this.html.classList.contains("view")) {
-    $("section[aria-selected]").scrollIntoView(true);
+    $("section[aria-selected]")[0].scrollIntoView(true);
   }
 }
 
@@ -295,20 +296,20 @@ Dz.setSlide = function(aIdx) {
   var old = $("section[aria-selected]");
   var next = $("section:nth-of-type("+ this.idx +")");
   if (old) {
-    old.removeAttribute("aria-selected");
-    var video = old.$("video");
-    if (video) {
-      video.pause();
+    old.removeAttr('aria-selected');
+    var video = old.find("video");
+    if (video.length) {
+      video[0].pause();
     }
   }
   if (next) {
-    next.setAttribute("aria-selected", "true");
+    next.attr("aria-selected", "true");
     if (this.html.classList.contains("view")) {
       next.scrollIntoView();
     }
-    var video = next.$("video");
-    if (video && !!+this.params.autoplay) {
-      video.play();
+    var video = next.find("video");
+    if (video.length && !!+this.params.autoplay) {
+      video[0].play();
     }
   } else {
     // That should not happen
@@ -319,15 +320,12 @@ Dz.setSlide = function(aIdx) {
 }
 
 Dz.setIncremental = function(aStep) {
-  // TODO - badly broken.
-  console.log(this.step, aStep);
-
   this.step = aStep;
   navigateFragment(aStep - 1);
 }
 
 Dz.goFullscreen = function() {
-  var html = $('html'),
+  var html = $('html')[0],
       requestFullscreen = html.requestFullscreen || html.requestFullScreen || html.mozRequestFullScreen || html.webkitRequestFullScreen;
   if (requestFullscreen) {
     requestFullscreen.apply(html);
@@ -339,10 +337,10 @@ Dz.setProgress = function(aIdx, aStep) {
   if (!slide) {
     return;
   }
-  var steps = slide.$$('.fragment').length + 1,
+  var steps = slide.find('.fragment').length + 1, // fragment length broken
       slideSize = 100 / (this.slides.length - 1),
       stepSize = slideSize / steps;
-  this.progressBar.style.width = ((aIdx - 1) * slideSize + aStep * stepSize) + '%';
+  this.progressBar.css({'width': ((aIdx - 1) * slideSize + aStep * stepSize) + '%'});
 }
 
 Dz.postMsg = function(win, message) { // [arg0, [arg1...]]
@@ -359,9 +357,10 @@ Dz.sendEvent = function(type, data) {
 };
 
 function init() {
-  $$.forEach($$('[data-markdown]'), function(el) {
-    el.innerHTML = markdown.toHTML(el.innerHTML);
-    el.removeAttribute('data-markdown');
+  $('[data-markdown]').each(function() {
+    var notes = markdown.toHTML($(this).html());
+    $(this).html(notes);
+    $(this).removeAttr('data-markdown');
   });
   Dz.init();
   window.onkeydown = Dz.onkeydown.bind(Dz);
