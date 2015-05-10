@@ -320,46 +320,10 @@ Dz.setSlide = function(aIdx) {
 
 Dz.setIncremental = function(aStep) {
   // TODO - badly broken.
+  console.log(this.step, aStep);
+
   this.step = aStep;
-  var previous_fragment = this.slides[this.idx - 1].$('.fragment[aria-selected]');
-  if (previous_fragment) {
-    previous_fragment.removeAttribute('aria-selected');
-    if (previous_fragment.classList.contains('fade-out')) {
-      previous_fragment.classList.add('hidden');
-    }
-    if (previous_fragment.dataset.dcRemove) {
-      previous_fragment.classList.add('removed');
-    }
-  }
-  var fragments = $$('.fragment');
-  if (this.step < 0) {
-    $$.forEach(fragments, function(el) {
-      el.removeAttribute('active');
-    });
-    return;
-  }
-  var next = this.slides[this.idx - 1].$$('.fragment')[this.step - 1];
-  if (next) {
-    next.setAttribute('aria-selected', true);
-    next.closest('.fragment').setAttribute('active', true);
-    next.classList.remove('hidden');
-    var found = false;
-    $$.forEach(fragments, function(el) {
-      if (el != next.parentNode) {
-        if (found) {
-          el.removeAttribute('active');
-        }
-        else {
-          el.setAttribute('active', true);
-        }
-      } else {
-        found = true;
-      }
-    });
-  } else {
-    Dz.setCursor(this.idx, 0);
-  }
-  return next;
+  navigateFragment(aStep - 1);
 }
 
 Dz.goFullscreen = function() {

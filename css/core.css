@@ -184,10 +184,15 @@ section[aria-selected] ~ section { left: +150%; }
 
 
 /* By default, visible */
-.fragment { opacity: 1; }
+.fragment {
+  opacity: 1;
+}
 
 /* The current item */
-.fragment[aria-selected] { opacity: 1; }
+.fragment.visible {
+  visibility: visible;
+  opacity: 1;
+}
 
 /* The items to-be-selected */
 .fragment[aria-selected] ~ * { opacity: 0; }
