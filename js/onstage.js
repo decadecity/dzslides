@@ -68,6 +68,9 @@ Dz.onmessage = function(aEvent) {
       if (parseInt(next_slide, 10) > parseInt($("#slidecount").html(), 10)) {
         next_slide = 'END';
       }
+      if (parseInt(next_slide, 10) < 0) {
+        next_slide = 'END';
+      }
       $("#nextslideidx").html(next_slide);
     }
   }

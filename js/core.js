@@ -14,8 +14,8 @@
 
 var Dz = {
   remoteWindows: [],
-  idx: -1,
-  step: 0,
+  idx: -1, // Global state. Current slide
+  step: 0, // Global state. Current fragment
   html: null,
   slides: null,
   progressBar : null,
@@ -31,7 +31,6 @@ Dz.init = function() {
   this.html = $('html')[0];
   this.setupParams();
   this.onhashchange();
-  this.setupTouchEvents();
   this.onresize();
   this.setupView();
   this.sortAllFragments();
@@ -92,37 +91,6 @@ Dz.onkeydown = function(aEvent) {
   }
 }
 
-/* Touch Events */
-
-Dz.setupTouchEvents = function() {
-  var orgX, newX;
-  var tracking = false;
-
-  var db = document.body;
-  db.addEventListener("touchstart", start.bind(this), false);
-  db.addEventListener("touchmove", move.bind(this), false);
-
-  function start(aEvent) {
-    aEvent.preventDefault();
-    tracking = true;
-    orgX = aEvent.changedTouches[0].pageX;
-  }
-
-  function move(aEvent) {
-    if (!tracking) return;
-    newX = aEvent.changedTouches[0].pageX;
-    if (orgX - newX > 100) {
-      tracking = false;
-      this.forward();
-    } else {
-      if (orgX - newX < -100) {
-        tracking = false;
-        this.back();
-      }
-    }
-  }
-}
-
 Dz.setupView = function() {
   document.body.addEventListener("click", function ( e ) {
     if (!Dz.html.classList.contains("view")) {
@@ -145,7 +113,8 @@ Dz.onresize = function() {
   var sy = container.offsetHeight / window.innerHeight;
   var transform = 'scale(' + (1/Math.max(sx, sy)) + ')';
 
-  $$.forEach($$('.scaled'), function(el) {
+  $('.scaled').each(function() {
+    var el = $(this)[0];
     el.style.MozTransform = transform;
     el.style.WebkitTransform = transform;
     el.style.OTransform = transform;
@@ -176,7 +145,7 @@ Dz.onmessage = function(aEvent) {
   if (argv[0] === "REGISTER" && argc === 1) {
     this.remoteWindows.push(win);
     this.postMsg(win, "REGISTERED", document.title, this.slides.length);
-    this.postMsg(win, "CURSOR", this.idx + "." + this.step);
+    this.postMsg(win, "CURSOR", this.idx + "." + this.step); // Global state.
     return;
   }
   if (argv[0] === "BACK" && argc === 1) {
@@ -198,10 +167,10 @@ Dz.onmessage = function(aEvent) {
     window.location.hash = "#" + argv[1];
   }
   if (argv[0] === "GET_CURSOR" && argc === 1) {
-    this.postMsg(win, "CURSOR", this.idx + "." + this.step);
+    this.postMsg(win, "CURSOR", this.idx + "." + this.step); // Global state.
   }
   if (argv[0] === "GET_NOTES" && argc === 1) {
-    this.postMsg(win, "NOTES", this.getNotes(this.idx));
+    this.postMsg(win, "NOTES", this.getNotes(this.idx)); // Global state.
   }
 }
 
@@ -236,19 +205,17 @@ Dz.onhashchange = function() {
   if (cursor.length == 2) {
     newidx = parseInt(cursor[1].split(".")[0], 10);
     newstep = parseInt(cursor[1].split(".")[1], 10);
-    console.log(newidx, newstep);
     var fragments = $(Dz.slides[newidx - 1]).data('dc-fragments');
-    console.log(fragments);
-    if (newstep > fragments) { // fragment length broken
+    if (newstep > fragments) {
       newstep = 0;
       newidx++;
     }
   }
   this.setProgress(newidx, newstep);
-  if (newidx != this.idx) {
+  if (newidx != this.idx) { // Global state.
     this.setSlide(newidx);
   }
-  if (newstep != this.step) {
+  if (newstep != this.step) { // Global state.
     this.setIncremental(newstep);
   }
   for (var i = 0; i < this.remoteWindows.length; i++) {
@@ -257,25 +224,27 @@ Dz.onhashchange = function() {
 }
 
 Dz.back = function() {
-  if (this.idx == 1 && this.step == 0) {
+  if (this.idx == 1 && this.step == 0) { // Global state.
     return;
   }
-  if (this.step == 0) {
+  if (this.step == 0) { // Global state.
     this.setCursor(this.idx - 1, $(this.slides[this.idx - 2]).data('dc-fragments'));
   } else {
-    this.setCursor(this.idx, this.step - 1);
+    this.setCursor(this.idx, this.step - 1); // Global state.
   }
 }
 
 Dz.forward = function() {
+   // Global state.
   if (this.idx >= this.slides.length &&
-      this.step >= $(this.slides[this.idx - 1]).data('dc-fragments')) { // fragment length broken
+      this.step >= $(this.slides[this.idx - 1]).data('dc-fragments')) {
       return;
   }
-  if (this.step >= $(this.slides[this.idx - 1]).data('dc-fragments')) { // fragment length broken
-    this.setCursor(this.idx + 1, 0);
+   // Global state.
+  if (this.step >= $(this.slides[this.idx - 1]).data('dc-fragments')) {
+    this.setCursor(this.idx + 1, 0); // Global state.
   } else {
-    this.setCursor(this.idx, this.step + 1);
+    this.setCursor(this.idx, this.step + 1); // Global state.
   }
 }
 
@@ -285,7 +254,7 @@ Dz.goStart = function() {
 
 Dz.goEnd = function() {
   var lastIdx = this.slides.length;
-  var lastStep = $(this.slides[this.idx - 1]).data('dc-fragments'); // fragment length broken
+  var lastStep = $(this.slides[this.idx - 1]).data('dc-fragments');
   this.setCursor(lastIdx, lastStep);
 }
 
@@ -298,17 +267,17 @@ Dz.toggleView = function() {
 }
 
 Dz.setSlide = function(aIdx) {
-  this.idx = aIdx;
+  this.idx = aIdx; // Global state.
   var old = $("section[aria-selected]");
   var next = $("section:nth-of-type("+ this.idx +")");
-  if (old) {
+  if (old.length) {
     old.removeAttr('aria-selected');
     var video = old.find("video");
     if (video.length) {
       video[0].pause();
     }
   }
-  if (next) {
+  if (next.length) {
     next.attr("aria-selected", "true");
     if (this.html.classList.contains("view")) {
       next.scrollIntoView();
@@ -319,19 +288,25 @@ Dz.setSlide = function(aIdx) {
     }
   } else {
     // That should not happen
-    this.idx = -1;
+    this.idx = -1; // Global state.
     // console.warn("Slide doesn't exist.");
   }
   Dz.sendEvent('SLIDE_CHANGE');
 }
 
+/**
+ * Navigates through fragments within a slide.
+ *
+ * @param aStep {int} Fragment index to navigate to.
+ */
 Dz.setIncremental = function(aStep) {
-  this.step = aStep;
+  // Here be off by one errors.
+  this.step = aStep; // Global state.
   Dz.navigateFragment(aStep - 1);
 }
 
 Dz.goFullscreen = function() {
-  var html = $('html')[0],
+  var html = this.html[0],  // Global state.
       requestFullscreen = html.requestFullscreen || html.requestFullScreen || html.mozRequestFullScreen || html.webkitRequestFullScreen;
   if (requestFullscreen) {
     requestFullscreen.apply(html);
@@ -340,10 +315,10 @@ Dz.goFullscreen = function() {
 
 Dz.setProgress = function(aIdx, aStep) {
   var slide = $("section:nth-of-type("+ aIdx +")");
-  if (!slide) {
+  if (!slide.length) {
     return;
   }
-  var steps = slide.data('dc-fragments'), // fragment length broken
+  var steps = slide.data('dc-fragments'),
       slideSize = 100 / (this.slides.length - 1),
       stepSize = slideSize / steps;
   this.progressBar.css({'width': ((aIdx - 1) * slideSize + aStep * stepSize) + '%'});
@@ -357,6 +332,13 @@ Dz.postMsg = function(win, message) { // [arg0, [arg1...]]
   win.postMessage(message.join(" "), "*");
 }
 
+/**
+ * Sends an event to `document` which allows other areas
+ * to bind in order to register functionality.
+ *
+ * @param type {string} Type of event.
+ * @param data {mixed} Data to be bound to the event.
+ */
 Dz.sendEvent = function(type, data) {
   var event = new CustomEvent(type, {
     detail: data
@@ -364,12 +346,25 @@ Dz.sendEvent = function(type, data) {
   document.dispatchEvent(event);
 };
 
-function init() {
-  $('[data-markdown]').each(function() {
-    var notes = markdown.toHTML($(this).html());
-    $(this).html(notes);
+/**
+ * Converts all items within the target with a `data-markdown` flag
+ * from md to HTML.
+ *
+ * @param target {jQuery element list} Area within which to search.
+ */
+Dz.convertMarkdown = function(target) {
+  if (typeof markdown === 'undefined' && typeof markdown.toHTML !== 'function') {
+    return;
+  }
+  target.find('[data-markdown]').each(function() {
+    var content = markdown.toHTML($(this).html());
+    $(this).html(content);
     $(this).removeAttr('data-markdown');
   });
+};
+
+function init() {
+  Dz.convertMarkdown($(document));
   Dz.init();
   window.onkeydown = Dz.onkeydown.bind(Dz);
   window.onresize = Dz.onresize.bind(Dz);
@@ -377,4 +372,4 @@ function init() {
   window.onmessage = Dz.onmessage.bind(Dz);
 }
 
-window.onload = init;
+$(window).on('load', init);
