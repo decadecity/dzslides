@@ -107,7 +107,7 @@ Dz.navigateFragment = function(index, offset) {
 
       // If no index is specified, find the current
       if(typeof index !== 'number') {
-        var last_visisble_fragment = sortFragments(current_slide.find('.fragment.visible')).pop();
+        var last_visisble_fragment = Dz.sortFragments(current_slide.find('.fragment.visible')).pop();
         if(last_visisble_fragment) {
           index = parseInt(last_visisble_fragment.data('fragment-index') || 0, 10 );
         }

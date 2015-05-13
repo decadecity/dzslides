@@ -10,8 +10,7 @@ module.exports = function(grunt) {
         coverage: {
           disposeCollector: true,
           src: [
-            'js/**/*.js',
-            '!js/jquery.js'
+            'src/**/*.js'
           ],
           instrumentedFiles: 'tmp/',
           htmlReport: 'report/coverage',
@@ -30,7 +29,7 @@ module.exports = function(grunt) {
       },
       files: [
         'Gruntfile.js',
-        'js/**/*.js',
+        'src/**/*.js',
         'test/**/*.js'
       ],
       tasks: 'default'
@@ -57,8 +56,7 @@ module.exports = function(grunt) {
       },
       files: [
         'Gruntfile.js',
-        'js/**/*.js',
-        '!js/jquery.js',
+        'src/**/*.js',
         'test/**/*.js'
       ]
     }
@@ -66,11 +64,11 @@ module.exports = function(grunt) {
 
   // For some things we want to limit the scope of the action when a file changes.
   grunt.event.on('watch', function(action, filepath) {
-    if (filepath.lastIndexOf('js/', 0) === 0) {
+    if (filepath.lastIndexOf('src/js', 0) === 0) {
     console.log(filepath);
       // If it's a source file then only hint and test that file.
       grunt.config('jshint.files', filepath);
-      grunt.config('qunit.files', filepath.replace(/js\/(.*)$/, 'test/$1_test.html'));
+      grunt.config('qunit.files', filepath.replace(/src\/js\/(.*)$/, 'test/$1_test.html'));
       grunt.config('qunit.options.coverage.src', filepath);
     }
     if (filepath.lastIndexOf('test/', 0) === 0) {
