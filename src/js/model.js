@@ -43,12 +43,12 @@ DCslides.model.getProgress = function() {
 DCslides.model.forward = function() {
   var slide_fragments = DCslides.model.getCurrentSlide();
   if (DCslides.model.fragment >= slide_fragments) {
+    // No more fragments so next slide.
     var new_slide = DCslides.model.slide + 1;
     try {
       DCslides.model.getSlide(new_slide);
       DCslides.model.slide = new_slide;
       DCslides.model.fragment = 0;
-      return;
     } catch(e) {
       /* pass */
       return;
@@ -56,6 +56,23 @@ DCslides.model.forward = function() {
   } else {
     DCslides.model.fragment += 1;
   }
+  //DCslides.model.setCursor(DCslides.model.slide, DCslides.model.fragment);
+};
+
+DCslides.model.backward = function() {
+  var slide_fragments = DCslides.model.getCurrentSlide();
+  if (DCslides.model.fragment > 0) {
+    DCslides.model.fragment -= 1;
+  } else if (DCslides.model.slide > 0) {
+    DCslides.model.slide -= 1;
+    DCslides.model.fragment = DCslides.model.getCurrentSlide();
+  }
+
+  //DCslides.model.setCursor(DCslides.model.slide, DCslides.model.fragment);
+};
+
+DCslides.model.getCursor = function() {
+  return [DCslides.model.slide, DCslides.model.fragment];
 };
 
 DCslides.model.setCursor = function(slide, fragment) {
@@ -71,5 +88,5 @@ DCslides.model.setCursor = function(slide, fragment) {
     DCslides.model.slide = 0;
     DCslides.model.fragment = 0;
   }
-
+  // Trigger event.
 };

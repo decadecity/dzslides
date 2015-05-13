@@ -128,7 +128,11 @@ QUnit.test('Get the terminal slides', function(assert) {
 });
 
 QUnit.test('Set the current slide', function(assert) {
-  assert.strictEqual(typeof window.DCslides.model.setSlide, 'function', 'Method exists.');
+  assert.strictEqual(
+    typeof window.DCslides.model.setSlide,
+    'function',
+    'Method exists.'
+  );
 
   window.DCslides.model.slide = 0;
   var first_slide = { 'first_slide': true };
@@ -178,6 +182,21 @@ QUnit.test('Gets the progresss', function(assert) {
   );
 });
 
+QUnit.test('Gets the cursor', function(assert) {
+  assert.strictEqual(
+    typeof window.DCslides.model.getCursor,
+    'function',
+    'Method exists.'
+  );
+  window.DCslides.model.slide = 1;
+  window.DCslides.model.fragment = 2;
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [1, 2],
+    'Gets the cursor'
+  );
+});
+
 QUnit.test('Moves forward', function(assert) {
   assert.strictEqual(
     typeof window.DCslides.model.forward,
@@ -187,51 +206,82 @@ QUnit.test('Moves forward', function(assert) {
 
   window.DCslides.model.slide = 0;
   window.DCslides.model.fragment = 0;
-  window.DCslides.model.slides = [
-    0
-  ];
+  window.DCslides.model.slides = [0];
   window.DCslides.model.forward();
-  assert.strictEqual(
-    window.DCslides.model.slide,
-    0,
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [0, 0],
     "Doesn't advance slide when there's only one slide."
   );
 
   window.DCslides.model.slide = 0;
   window.DCslides.model.fragment = 0;
-  window.DCslides.model.slides = [
-    0,
-    1,
-    0
-  ];
+  window.DCslides.model.slides = [0, 1, 0];
   window.DCslides.model.forward();
-  assert.strictEqual(
-    window.DCslides.model.slide,
-    1,
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [1, 0],
     'Advances slide when there are no fragments'
   );
   window.DCslides.model.forward();
-  assert.strictEqual(
-    window.DCslides.model.slide,
-    1,
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [1, 1],
     "Doesn't advance slide when there's a fragment left."
   );
-  assert.strictEqual(
-    window.DCslides.model.fragment,
-    1,
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [1, 1],
     'Advances fragment'
   );
   window.DCslides.model.forward();
-  assert.strictEqual(
-    window.DCslides.model.slide,
-    2,
-    'Advances slide when on the last fragment'
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [2, 0],
+    'Advances slide and resets fragment when on the last fragment'
   );
+});
+
+QUnit.test('Moves backward', function(assert) {
   assert.strictEqual(
-    window.DCslides.model.fragment,
-    0,
-    'Resets fragment when moving to new slide'
+    typeof window.DCslides.model.backward,
+    'function',
+    'Method exists.'
   );
+
+  window.DCslides.model.slide = 0;
+  window.DCslides.model.fragment = 0;
+  window.DCslides.model.slides = [0];
+  window.DCslides.model.backward();
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [0, 0],
+    "Doesn't retire slide when there's only one slide."
+  );
+
+  window.DCslides.model.slide = 2;
+  window.DCslides.model.fragment = 0;
+  window.DCslides.model.slides = [1, 0, 0];
+  window.DCslides.model.backward();
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [1, 0],
+    'Retires slide when there are no fragments'
+  );
+
+  window.DCslides.model.backward();
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [0, 1],
+    'Retires slide to last fragment of previous slide.'
+  );
+  window.DCslides.model.backward();
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [0, 0],
+    'Retires fragment'
+  );
+
 });
 
 QUnit.test('Sets the cursor', function(assert) {
@@ -243,26 +293,23 @@ QUnit.test('Sets the cursor', function(assert) {
 
   window.DCslides.model.slide = 0;
   window.DCslides.model.fragment = 0;
-  window.DCslides.model.slides = [
-    0,
-    1
-  ];
+  window.DCslides.model.slides = [0, 1];
   window.DCslides.model.setCursor(1, 1);
   assert.deepEqual(
-    [window.DCslides.model.slide, window.DCslides.model.fragment],
+    window.DCslides.model.getCursor(),
     [1, 1],
     'Sets a valid cursor'
   );
   window.DCslides.model.setCursor(1, 2);
   assert.deepEqual(
-    [window.DCslides.model.slide, window.DCslides.model.fragment],
+    window.DCslides.model.getCursor(),
     [1, 0],
     'Catches an invalid cursor fragment'
   );
   window.DCslides.model.fragment = 1;
   window.DCslides.model.setCursor(2, 1);
   assert.deepEqual(
-    [window.DCslides.model.slide, window.DCslides.model.fragment],
+    window.DCslides.model.getCursor(),
     [0, 0],
     'Catches an invalid cursor slide'
   );
