@@ -18,26 +18,26 @@ Dz.onkeydown = function(aEvent) {
     || aEvent.shiftKey) {
     return;
   }
-  if ( aEvent.keyCode == 37 // left arrow
+  if ( aEvent.keyCode === 37 // left arrow
     //|| aEvent.keyCode == 38 // up arrow
-    || aEvent.keyCode == 33 // page up
+    || aEvent.keyCode === 33 // page up
   ) {
     aEvent.preventDefault();
     this.back();
   }
-  if ( aEvent.keyCode == 39 // right arrow
+  if ( aEvent.keyCode === 39 // right arrow
     //|| aEvent.keyCode == 40 // down arrow
-    || aEvent.keyCode == 32 // space
-    || aEvent.keyCode == 34 // page down
+    || aEvent.keyCode === 32 // space
+    || aEvent.keyCode === 34 // page down
   ) {
     aEvent.preventDefault();
     this.forward();
   }
-  if (aEvent.keyCode == 35) { // end
+  if (aEvent.keyCode === 35) { // end
     aEvent.preventDefault();
     this.goEnd();
   }
-  if (aEvent.keyCode == 36) { // home
+  if (aEvent.keyCode === 36) { // home
     aEvent.preventDefault();
     this.goStart();
   }
@@ -120,8 +120,9 @@ Dz.loadIframes = function() {
 };
 
 Dz.toggleContent = function() {
-  if (this.views.remote)
+  if (this.views.remote) {
     this.postMsg(this.views.remote, "TOGGLE_CONTENT");
+  }
 };
 
 Dz.onhashchange = function() {

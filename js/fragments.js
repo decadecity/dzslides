@@ -1,3 +1,5 @@
+/*global Dz:false */
+
 /**
  * Sorts and formats all of fragments in the
  * presentation.
@@ -177,27 +179,4 @@ Dz.navigateFragment = function(index, offset) {
 
 };
 
-/**
- * Navigate to the next slide fragment.
- *
- * @return {Boolean} true if there was a next fragment,
- * false otherwise
- */
-Dz.nextFragment = function() {
-
-  return navigateFragment( null, 1 );
-
-};
-
-/**
- * Navigate to the previous slide fragment.
- *
- * @return {Boolean} true if there was a previous fragment,
- * false otherwise
- */
-Dz.previousFragment = function() {
-
-  return navigateFragment( null, -1 );
-
-};
 

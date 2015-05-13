@@ -1,3 +1,5 @@
+/*global markdown:false, $$:false */
+
 /*{{{{ dzslides core
 #
 #
@@ -58,37 +60,37 @@ Dz.onkeydown = function(aEvent) {
     || aEvent.shiftKey) {
     return;
   }
-  if ( aEvent.keyCode == 37 // left arrow
-    || aEvent.keyCode == 38 // up arrow
-    || aEvent.keyCode == 33 // page up
+  if ( aEvent.keyCode === 37 // left arrow
+    || aEvent.keyCode === 38 // up arrow
+    || aEvent.keyCode === 33 // page up
   ) {
     aEvent.preventDefault();
     this.back();
   }
-  if ( aEvent.keyCode == 39 // right arrow
-    || aEvent.keyCode == 40 // down arrow
-    || aEvent.keyCode == 34 // page down
+  if ( aEvent.keyCode === 39 // right arrow
+    || aEvent.keyCode === 40 // down arrow
+    || aEvent.keyCode === 34 // page down
   ) {
     aEvent.preventDefault();
     this.forward();
   }
-  if (aEvent.keyCode == 35) { // end
+  if (aEvent.keyCode === 35) { // end
     aEvent.preventDefault();
     this.goEnd();
   }
-  if (aEvent.keyCode == 36) { // home
+  if (aEvent.keyCode === 36) { // home
     aEvent.preventDefault();
     this.goStart();
   }
-  if (aEvent.keyCode == 32) { // space
+  if (aEvent.keyCode === 32) { // space
     aEvent.preventDefault();
     this.toggleContent();
   }
-  if (aEvent.keyCode == 70) { // f
+  if (aEvent.keyCode === 70) { // f
     aEvent.preventDefault();
     this.goFullscreen();
   }
-  if (aEvent.keyCode == 79) { // o
+  if (aEvent.keyCode === 79) { // o
     aEvent.preventDefault();
     this.toggleView();
   }
@@ -99,7 +101,7 @@ Dz.setupView = function() {
     if (!Dz.html.classList.contains("view")) {
       return;
     }
-    if (!e.target || e.target.nodeName != "SECTION") {
+    if (!e.target || e.target.nodeName !== "SECTION") {
       return;
     }
 
@@ -205,7 +207,7 @@ Dz.onhashchange = function() {
   var cursor = window.location.hash.split("#"),
       newidx = 1,
       newstep = 0;
-  if (cursor.length == 2) {
+  if (cursor.length === 2) {
     newidx = parseInt(cursor[1].split(".")[0], 10);
     newstep = parseInt(cursor[1].split(".")[1], 10);
     var fragments = $(Dz.slides[newidx - 1]).data('dc-fragments');
@@ -215,10 +217,10 @@ Dz.onhashchange = function() {
     }
   }
   this.setProgress(newidx, newstep);
-  if (newidx != this.idx) { // Global state.
+  if (newidx !== this.idx) { // Global state.
     this.setSlide(newidx);
   }
-  if (newstep != this.step) { // Global state.
+  if (newstep !== this.step) { // Global state.
     this.setIncremental(newstep);
   }
   for (var i = 0; i < this.remoteWindows.length; i++) {
