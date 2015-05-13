@@ -65,7 +65,6 @@ module.exports = function(grunt) {
   // For some things we want to limit the scope of the action when a file changes.
   grunt.event.on('watch', function(action, filepath) {
     if (filepath.lastIndexOf('src/js', 0) === 0) {
-    console.log(filepath);
       // If it's a source file then only hint and test that file.
       grunt.config('jshint.files', filepath);
       grunt.config('qunit.files', filepath.replace(/src\/js\/(.*)$/, 'test/$1_test.html'));
