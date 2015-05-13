@@ -41,12 +41,35 @@ DCslides.model.getProgress = function() {
 };
 
 DCslides.model.forward = function() {
-  var new_slide = DCslides.model.slide + 1;
-  try {
-    DCslides.model.getSlide(new_slide);
-    DCslides.model.slide = new_slide;
-    DCslides.model.fragment = 0;
-  } catch(e) {
-    /* pass */
+  var slide_fragments = DCslides.model.getCurrentSlide();
+  if (DCslides.model.fragment >= slide_fragments) {
+    var new_slide = DCslides.model.slide + 1;
+    try {
+      DCslides.model.getSlide(new_slide);
+      DCslides.model.slide = new_slide;
+      DCslides.model.fragment = 0;
+      return;
+    } catch(e) {
+      /* pass */
+      return;
+    }
+  } else {
+    DCslides.model.fragment += 1;
   }
+};
+
+DCslides.model.setCursor = function(slide, fragment) {
+  try {
+    var slide_fragments = DCslides.model.getSlide(slide);
+    DCslides.model.slide = slide;
+    if (fragment >= 0 && fragment <= slide_fragments) {
+      DCslides.model.fragment = fragment;
+    } else {
+      DCslides.model.fragment = 0;
+    }
+  } catch(e) {
+    DCslides.model.slide = 0;
+    DCslides.model.fragment = 0;
+  }
+
 };

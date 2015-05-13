@@ -188,7 +188,7 @@ QUnit.test('Moves forward', function(assert) {
   window.DCslides.model.slide = 0;
   window.DCslides.model.fragment = 0;
   window.DCslides.model.slides = [
-    { 'fragments': 0 }
+    0
   ];
   window.DCslides.model.forward();
   assert.strictEqual(
@@ -198,27 +198,72 @@ QUnit.test('Moves forward', function(assert) {
   );
 
   window.DCslides.model.slide = 0;
-  window.DCslides.model.fragment = 1;
+  window.DCslides.model.fragment = 0;
   window.DCslides.model.slides = [
-    { 'fragments': 0 },
-    { 'fragments': 0 }
+    0,
+    1,
+    0
   ];
   window.DCslides.model.forward();
   assert.strictEqual(
     window.DCslides.model.slide,
     1,
-    'Advances slide'
+    'Advances slide when there are no fragments'
   );
+  window.DCslides.model.forward();
   assert.strictEqual(
-    window.DCslides.model.fragment,
-    0,
-    'Resets fragment'
+    window.DCslides.model.slide,
+    1,
+    "Doesn't advance slide when there's a fragment left."
   );
-
-  /*window.DCslides.model.forward();
   assert.strictEqual(
     window.DCslides.model.fragment,
     1,
     'Advances fragment'
-  );*/
+  );
+  window.DCslides.model.forward();
+  assert.strictEqual(
+    window.DCslides.model.slide,
+    2,
+    'Advances slide when on the last fragment'
+  );
+  assert.strictEqual(
+    window.DCslides.model.fragment,
+    0,
+    'Resets fragment when moving to new slide'
+  );
+});
+
+QUnit.test('Sets the cursor', function(assert) {
+  assert.strictEqual(
+    typeof window.DCslides.model.setCursor,
+    'function',
+    'Method exists.'
+  );
+
+  window.DCslides.model.slide = 0;
+  window.DCslides.model.fragment = 0;
+  window.DCslides.model.slides = [
+    0,
+    1
+  ];
+  window.DCslides.model.setCursor(1, 1);
+  assert.deepEqual(
+    [window.DCslides.model.slide, window.DCslides.model.fragment],
+    [1, 1],
+    'Sets a valid cursor'
+  );
+  window.DCslides.model.setCursor(1, 2);
+  assert.deepEqual(
+    [window.DCslides.model.slide, window.DCslides.model.fragment],
+    [1, 0],
+    'Catches an invalid cursor fragment'
+  );
+  window.DCslides.model.fragment = 1;
+  window.DCslides.model.setCursor(2, 1);
+  assert.deepEqual(
+    [window.DCslides.model.slide, window.DCslides.model.fragment],
+    [0, 0],
+    'Catches an invalid cursor slide'
+  );
 });
