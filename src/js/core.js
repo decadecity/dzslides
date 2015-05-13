@@ -35,7 +35,9 @@ Dz.init = function() {
   this.onhashchange();
   this.onresize();
   this.setupView();
-  this.sortAllFragments();
+  if (typeof this.sortAllFragments === 'function') {
+    this.sortAllFragments();
+  }
 };
 
 Dz.setupParams = function() {
@@ -346,10 +348,15 @@ Dz.postMsg = function(win, message) { // [arg0, [arg1...]]
  * @param data {mixed} Data to be bound to the event.
  */
 Dz.sendEvent = function(type, data) {
-  var event = new CustomEvent(type, {
-    detail: data
-  });
-  document.dispatchEvent(event);
+  // This isn't using new CustomEvent('keydown') due to a webkit bug in phantom.
+  // https://github.com/ariya/phantomjs/issues/11289
+  if (window.CustomEvent) {
+    document.dispatchEvent(new window.CustomEvent(type, data));
+  } else {
+    var evt = document.createEvent('CustomEvent');  // MUST be 'CustomEvent'
+    evt.initCustomEvent(type, false, false, data);
+    document.dispatchEvent(evt);
+  }
 };
 
 /**
@@ -359,7 +366,7 @@ Dz.sendEvent = function(type, data) {
  * @param target {jQuery element list} Area within which to search.
  */
 Dz.convertMarkdown = function(target) {
-  if (typeof markdown === 'undefined' && typeof markdown.toHTML !== 'function') {
+  if (typeof markdown === 'undefined' || typeof markdown.toHTML !== 'function') {
     return;
   }
   target.find('[data-markdown]').each(function() {
