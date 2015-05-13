@@ -18,7 +18,7 @@ Dz.sortAllFragments = function() {
     total_fragments += last_index;
   });
   $('.slides').data('dc-fragments-all', total_fragments);
-}
+};
 
 /**
  * Return a sorted fragments list, ordered by an increasing
@@ -123,7 +123,7 @@ Dz.navigateFragment = function(index, offset) {
           fragments_hidden = [];
 
       fragments.forEach(function(fragment, i) {
-        var fragment = $(fragment);
+        fragment = $(fragment);
 
         if(typeof fragment.data('fragment-index') !== 'undefined') {
           i = parseInt(fragment.data('fragment-index'), 10);
@@ -187,7 +187,7 @@ Dz.nextFragment = function() {
 
   return navigateFragment( null, 1 );
 
-}
+};
 
 /**
  * Navigate to the previous slide fragment.
@@ -199,5 +199,5 @@ Dz.previousFragment = function() {
 
   return navigateFragment( null, -1 );
 
-}
+};
 

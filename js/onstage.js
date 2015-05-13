@@ -8,7 +8,7 @@ var Dz = {
 Dz.init = function() {
   this.startClock();
   this.loadIframes();
-}
+};
 
 Dz.onkeydown = function(aEvent) {
   // Don't intercept keyboard shortcuts
@@ -45,12 +45,12 @@ Dz.onkeydown = function(aEvent) {
     aEvent.preventDefault();
     this.toggleContent();
   }*/
-}
+};
 
 Dz.onmessage = function(aEvent) {
   var argv = aEvent.data.split(" "), argc = argv.length;
   argv.forEach(function(e, i, a) {
-    a[i] = decodeURIComponent(e)
+    a[i] = decodeURIComponent(e);
   });
   if (argv[0] === "CURSOR" && argc === 2) {
     if (aEvent.source === this.views.present) {
@@ -84,7 +84,7 @@ Dz.onmessage = function(aEvent) {
       $("#slidecount").html(argv[2]);
     }
   }
-}
+};
 
 /* Get url from hash or prompt and store it */
 
@@ -102,7 +102,7 @@ Dz.getUrl = function() {
     url = "data:text/html," + encodeURIComponent(url);
   }
   return url;
-}
+};
 
 Dz.loadIframes = function() {
   var present = $("#present iframe");
@@ -116,41 +116,41 @@ Dz.loadIframes = function() {
       Dz.postMsg(Dz.views.present, "REGISTER");
       Dz.postMsg(Dz.views.future, "REGISTER");
     }
-  }
-}
+  };
+};
 
 Dz.toggleContent = function() {
   if (this.views.remote)
     this.postMsg(this.views.remote, "TOGGLE_CONTENT");
-}
+};
 
 Dz.onhashchange = function() {
   this.loadIframe();
-}
+};
 
 Dz.back = function() {
   this.postMsg(this.views.present, "BACK");
-}
+};
 
 Dz.forward = function() {
   this.postMsg(this.views.present, "FORWARD");
-}
+};
 
 Dz.goStart = function() {
   this.postMsg(this.views.present, "START");
-}
+};
 
 Dz.goEnd = function() {
   this.postMsg(this.views.present, "END");
-}
+};
 
 Dz.setCursor = function(aCursor) {
   this.postMsg(this.views.present, "SET_CURSOR", aCursor);
-}
+};
 
 Dz.popup = function() {
   this.views.remote = window.open(this.url + "#" + this.idx, 'slides', 'width=800,height=600,personalbar=0,toolbar=0,scrollbars=1,resizable=1');
-}
+};
 
 Dz.postMsg = function(aWin, aMsg) { // [arg0, [arg1...]]
   aMsg = [aMsg];
@@ -158,19 +158,19 @@ Dz.postMsg = function(aWin, aMsg) { // [arg0, [arg1...]]
     aMsg.push(encodeURIComponent(arguments[i]));
   }
   aWin.postMessage(aMsg.join(" "), "*");
-}
+};
 
 Dz.startClock = function() {
   var addZero = function(num) {
     return num < 10 ? '0' + num : num;
-  }
+  };
   setInterval(function() {
     var now = new Date();
     $("#hours").html(addZero(now.getHours()));
     $("#minutes").html(addZero(now.getMinutes()));
     $("#seconds").html(addZero(now.getSeconds()));
   }, 1000);
-}
+};
 
 function init() {
   Dz.init();

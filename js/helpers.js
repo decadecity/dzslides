@@ -33,4 +33,4 @@ var $$ = (HTMLElement.prototype.$$ = function(aQuery) {
 
 $$.forEach = function(nodeList, fun) {
   Array.prototype.forEach.call(nodeList, fun);
-}
+};

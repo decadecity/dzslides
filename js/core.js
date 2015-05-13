@@ -34,7 +34,7 @@ Dz.init = function() {
   this.onresize();
   this.setupView();
   this.sortAllFragments();
-}
+};
 
 Dz.setupParams = function() {
   var p = window.location.search.substr(1).split('&');
@@ -43,9 +43,12 @@ Dz.setupParams = function() {
     Dz.params[keyVal[0]] = decodeURIComponent(keyVal[1]);
   });
 // Specific params handling
-  if (!+this.params.autoplay)
-    $$.forEach($$("video"), function(v){ v.controls = true });
-}
+  if ((+this.params.autoplay) === 'false') { //????
+    $$.forEach($$("video"), function(v){
+      v.controls = true;
+    });
+  }
+};
 
 Dz.onkeydown = function(aEvent) {
   // Don't intercept keyboard shortcuts
@@ -89,7 +92,7 @@ Dz.onkeydown = function(aEvent) {
     aEvent.preventDefault();
     this.toggleView();
   }
-}
+};
 
 Dz.setupView = function() {
   document.body.addEventListener("click", function ( e ) {
@@ -103,7 +106,7 @@ Dz.setupView = function() {
     Dz.html.classList.remove("view");
     Dz.setCursor(Dz.slides.indexOf(e.target) + 1);
   }, false);
-}
+};
 
 /* Adapt the size of the slides to the window */
 
@@ -121,7 +124,7 @@ Dz.onresize = function() {
     el.style.msTransform = transform;
     el.style.transform = transform;
   });
-}
+};
 
 Dz.getCurrentSlide = function() {
   return $('.slides > section[aria-selected]');
@@ -131,14 +134,14 @@ Dz.getNotes = function(aIdx) {
   var slides = $('.slides > section:nth-of-type(' + aIdx + ')');
   var notes = slides.find('.notes');
   return notes.length ? notes.html() : '';
-}
+};
 
 Dz.onmessage = function(aEvent) {
   var argv = aEvent.data.split(" "),
       argc = argv.length;
 
   argv.forEach(function(e, i, a) {
-    a[i] = decodeURIComponent(e)
+    a[i] = decodeURIComponent(e);
   });
 
   var win = aEvent.source;
@@ -172,7 +175,7 @@ Dz.onmessage = function(aEvent) {
   if (argv[0] === "GET_NOTES" && argc === 1) {
     this.postMsg(win, "NOTES", this.getNotes(this.idx)); // Global state.
   }
-}
+};
 
 Dz.toggleContent = function() {
   // If a Video is present in this new slide, play it.
@@ -189,14 +192,14 @@ Dz.toggleContent = function() {
       }
     }
   }
-}
+};
 
 Dz.setCursor = function(aIdx, aStep) {
   // If the user change the slide number in the URL bar, jump
   // to this slide.
-  aStep = (aStep != 0 && typeof aStep !== "undefined") ? "." + aStep : ".0";
+  aStep = (aStep !== 0 && typeof aStep !== "undefined") ? "." + aStep : ".0";
   window.location.hash = "#" + aIdx + aStep;
-}
+};
 
 Dz.onhashchange = function() {
   var cursor = window.location.hash.split("#"),
@@ -221,18 +224,18 @@ Dz.onhashchange = function() {
   for (var i = 0; i < this.remoteWindows.length; i++) {
     this.postMsg(this.remoteWindows[i], "CURSOR", this.idx + "." + this.step);
   }
-}
+};
 
 Dz.back = function() {
-  if (this.idx == 1 && this.step == 0) { // Global state.
+  if (this.idx === 1 && this.step === 0) { // Global state.
     return;
   }
-  if (this.step == 0) { // Global state.
+  if (this.step === 0) { // Global state.
     this.setCursor(this.idx - 1, $(this.slides[this.idx - 2]).data('dc-fragments'));
   } else {
     this.setCursor(this.idx, this.step - 1); // Global state.
   }
-}
+};
 
 Dz.forward = function() {
    // Global state.
@@ -246,17 +249,17 @@ Dz.forward = function() {
   } else {
     this.setCursor(this.idx, this.step + 1); // Global state.
   }
-}
+};
 
 Dz.goStart = function() {
   this.setCursor(1, 0);
-}
+};
 
 Dz.goEnd = function() {
   var lastIdx = this.slides.length;
   var lastStep = $(this.slides[this.idx - 1]).data('dc-fragments');
   this.setCursor(lastIdx, lastStep);
-}
+};
 
 Dz.toggleView = function() {
   this.html.classList.toggle("view");
@@ -264,15 +267,16 @@ Dz.toggleView = function() {
   if (this.html.classList.contains("view")) {
     $("section[aria-selected]")[0].scrollIntoView(true);
   }
-}
+};
 
 Dz.setSlide = function(aIdx) {
   this.idx = aIdx; // Global state.
   var old = $("section[aria-selected]");
   var next = $("section:nth-of-type("+ this.idx +")");
+  var video;
   if (old.length) {
     old.removeAttr('aria-selected');
-    var video = old.find("video");
+    video = old.find("video");
     if (video.length) {
       video[0].pause();
     }
@@ -282,8 +286,8 @@ Dz.setSlide = function(aIdx) {
     if (this.html.classList.contains("view")) {
       next.scrollIntoView();
     }
-    var video = next.find("video");
-    if (video.length && !!+this.params.autoplay) {
+    video = next.find("video");
+    if (video.length && +this.params.autoplay) {
       video[0].play();
     }
   } else {
@@ -292,7 +296,7 @@ Dz.setSlide = function(aIdx) {
     // console.warn("Slide doesn't exist.");
   }
   Dz.sendEvent('SLIDE_CHANGE');
-}
+};
 
 /**
  * Navigates through fragments within a slide.
@@ -303,7 +307,7 @@ Dz.setIncremental = function(aStep) {
   // Here be off by one errors.
   this.step = aStep; // Global state.
   Dz.navigateFragment(aStep - 1);
-}
+};
 
 Dz.goFullscreen = function() {
   var html = this.html[0],  // Global state.
@@ -311,7 +315,7 @@ Dz.goFullscreen = function() {
   if (requestFullscreen) {
     requestFullscreen.apply(html);
   }
-}
+};
 
 Dz.setProgress = function(aIdx, aStep) {
   var slide = $("section:nth-of-type("+ aIdx +")");
@@ -322,7 +326,7 @@ Dz.setProgress = function(aIdx, aStep) {
       slideSize = 100 / (this.slides.length - 1),
       stepSize = slideSize / steps;
   this.progressBar.css({'width': ((aIdx - 1) * slideSize + aStep * stepSize) + '%'});
-}
+};
 
 Dz.postMsg = function(win, message) { // [arg0, [arg1...]]
   message = [message];
@@ -330,7 +334,7 @@ Dz.postMsg = function(win, message) { // [arg0, [arg1...]]
     message.push(encodeURIComponent(arguments[i]));
   }
   win.postMessage(message.join(" "), "*");
-}
+};
 
 /**
  * Sends an event to `document` which allows other areas
