@@ -238,7 +238,13 @@ QUnit.test('Moves forward', function(assert) {
   assert.deepEqual(
     window.DCslides.model.getCursor(),
     [2, 0],
-    'Advances slide and resets fragment when on the last fragment'
+    'Advances slide and resets fragment when on the last fragment.'
+  );
+  window.DCslides.model.forward();
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [2, 0],
+    'Hits the stop.'
   );
 });
 
@@ -280,6 +286,12 @@ QUnit.test('Moves backward', function(assert) {
     window.DCslides.model.getCursor(),
     [0, 0],
     'Retires fragment'
+  );
+  window.DCslides.model.backward();
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [0, 0],
+    'Hits the stop.'
   );
 
 });
