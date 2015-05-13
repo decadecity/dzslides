@@ -30,6 +30,23 @@ DCslides.model.getLastSlide = function() {
 };
 
 DCslides.model.setSlide = function(index) {
-  var slide =  DCslides.model.getSlide(index);
+  DCslides.model.getSlide(index);
   DCslides.model.slide = index;
+};
+
+DCslides.model.getProgress = function() {
+  var current = DCslides.model.slide;
+  var max = DCslides.model.slides.length - 1;
+  return current / max * 100;
+};
+
+DCslides.model.forward = function() {
+  var new_slide = DCslides.model.slide + 1;
+  try {
+    DCslides.model.getSlide(new_slide);
+    DCslides.model.slide = new_slide;
+    DCslides.model.fragment = 0;
+  } catch(e) {
+    /* pass */
+  }
 };
