@@ -56,7 +56,7 @@ DCslides.model.forward = function() {
   } else {
     DCslides.model.fragment += 1;
   }
-  //DCslides.model.setCursor(DCslides.model.slide, DCslides.model.fragment);
+  DCslides.model.setCursor();
 };
 
 DCslides.model.backward = function() {
@@ -68,7 +68,7 @@ DCslides.model.backward = function() {
     DCslides.model.fragment = DCslides.model.getCurrentSlide();
   }
 
-  //DCslides.model.setCursor(DCslides.model.slide, DCslides.model.fragment);
+  DCslides.model.setCursor();
 };
 
 DCslides.model.getCursor = function() {
@@ -76,6 +76,13 @@ DCslides.model.getCursor = function() {
 };
 
 DCslides.model.setCursor = function(slide, fragment) {
+  var old_cursor = DCslides.model.getCursor();
+  if (typeof slide === 'undefined') {
+    slide = DCslides.model.slide;
+  }
+  if (typeof fragment === 'undefined') {
+    fragment = DCslides.model.fragment;
+  }
   try {
     var slide_fragments = DCslides.model.getSlide(slide);
     DCslides.model.slide = slide;
@@ -88,5 +95,11 @@ DCslides.model.setCursor = function(slide, fragment) {
     DCslides.model.slide = 0;
     DCslides.model.fragment = 0;
   }
-  // Trigger event.
+  var new_cursor = DCslides.model.getCursor();
+  if (new_cursor[0] !== old_cursor[0] || new_cursor[1] !== old_cursor[1]) {
+    // Trigger event.
+    return true;
+  } else {
+    return false;
+  }
 };

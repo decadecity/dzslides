@@ -306,23 +306,51 @@ QUnit.test('Sets the cursor', function(assert) {
   window.DCslides.model.slide = 0;
   window.DCslides.model.fragment = 0;
   window.DCslides.model.slides = [0, 1];
+  window.DCslides.model.setCursor();
+  assert.deepEqual(
+    window.DCslides.model.getCursor(),
+    [0, 0],
+    'Sets the current cursor.'
+  );
+
+  assert.strictEqual(
+    window.DCslides.model.setCursor(),
+    false,
+    "Doesn't trigger when unchanged."
+  );
+  assert.strictEqual(
+    window.DCslides.model.setCursor(1, 0),
+    true,
+    "Triggers on changed slide."
+  );
+  assert.strictEqual(
+    window.DCslides.model.setCursor(1, 1),
+    true,
+    "Triggers on changd fragment."
+  );
+
+  window.DCslides.model.slide = 0;
+  window.DCslides.model.fragment = 0;
+
   window.DCslides.model.setCursor(1, 1);
   assert.deepEqual(
     window.DCslides.model.getCursor(),
     [1, 1],
-    'Sets a valid cursor'
+    'Sets a valid cursor.'
   );
+
   window.DCslides.model.setCursor(1, 2);
   assert.deepEqual(
     window.DCslides.model.getCursor(),
     [1, 0],
-    'Catches an invalid cursor fragment'
+    'Catches an invalid cursor fragment.'
   );
+
   window.DCslides.model.fragment = 1;
   window.DCslides.model.setCursor(2, 1);
   assert.deepEqual(
     window.DCslides.model.getCursor(),
     [0, 0],
-    'Catches an invalid cursor slide'
+    'Catches an invalid cursor slide.'
   );
 });
