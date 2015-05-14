@@ -127,33 +127,6 @@ QUnit.test('Get the terminal slides', function(assert) {
   );
 });
 
-QUnit.test('Set the current slide', function(assert) {
-  assert.strictEqual(
-    typeof window.DCslides.model.setSlide,
-    'function',
-    'Method exists.'
-  );
-
-  window.DCslides.model.slide = 0;
-  var first_slide = { 'first_slide': true };
-  var second_slide = { 'second_slide': true };
-  window.DCslides.model.slides = [
-    first_slide,
-    second_slide
-  ];
-  window.DCslides.model.setSlide(1);
-  assert.deepEqual(
-    window.DCslides.model.getCurrentSlide(),
-    second_slide,
-    'Correctly sets the first slide.'
-  );
-
-  assert.throws(
-    function() { window.DCslides.model.setSlide('invalid'); },
-    'Throws an error if slide is invalid.'
-  );
-});
-
 QUnit.test('Gets the progresss', function(assert) {
   assert.strictEqual(
     typeof window.DCslides.model.getProgress,

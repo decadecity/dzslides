@@ -29,11 +29,6 @@ DCslides.model.getLastSlide = function() {
   return DCslides.model.getSlide(DCslides.model.slides.length - 1);
 };
 
-DCslides.model.setSlide = function(index) {
-  DCslides.model.getSlide(index);
-  DCslides.model.slide = index;
-};
-
 DCslides.model.getProgress = function() {
   var current = DCslides.model.slide;
   var max = DCslides.model.slides.length - 1;
