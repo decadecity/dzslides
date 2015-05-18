@@ -1,3 +1,4 @@
+/* istanbul ignore next */
 var DCslides = window.DCslides || {};
 DCslides.model = DCslides.model || {};
 
