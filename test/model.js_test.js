@@ -286,20 +286,28 @@ QUnit.test('Sets the cursor', function(assert) {
     'Sets the current cursor.'
   );
 
+  window.DCslides.messaging._clear();
+  window.DCslides.model.setCursor();
   assert.strictEqual(
-    window.DCslides.model.setCursor(),
-    false,
-    "Doesn't trigger when unchanged."
+    window.DCslides.messaging.messages.length,
+    0,
+    "Doesn't trigger message when unchanged."
   );
+
+  window.DCslides.messaging._clear();
+  window.DCslides.model.setCursor(1, 0);
   assert.strictEqual(
-    window.DCslides.model.setCursor(1, 0),
-    true,
-    "Triggers on changed slide."
+    window.DCslides.messaging.messages[0],
+    'cursor_change',
+    "Triggers message on changed slide."
   );
+
+  window.DCslides.messaging._clear();
+  window.DCslides.model.setCursor(1, 1);
   assert.strictEqual(
-    window.DCslides.model.setCursor(1, 1),
-    true,
-    "Triggers on changd fragment."
+    window.DCslides.messaging.messages[0],
+    'cursor_change',
+    "Triggers message on changed fragment."
   );
 
   window.DCslides.model.slide = 0;

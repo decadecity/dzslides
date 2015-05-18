@@ -93,8 +93,6 @@ DCslides.model.setCursor = function(slide, fragment) {
   var new_cursor = DCslides.model.getCursor();
   if (new_cursor[0] !== old_cursor[0] || new_cursor[1] !== old_cursor[1]) {
     // Trigger event.
-    return true;
-  } else {
-    return false;
+    DCslides.messaging.message('cursor_change');
   }
 };
