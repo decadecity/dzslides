@@ -116,8 +116,8 @@ Dz.setupView = function() {
 
 Dz.onresize = function() {
   var container = $('#container');
-  var sx = container.offsetWidth / window.innerWidth;
-  var sy = container.offsetHeight / window.innerHeight;
+  var sx = container.width() / window.innerWidth;
+  var sy = container.height() / window.innerHeight;
   var transform = 'scale(' + (1/Math.max(sx, sy)) + ')';
 
   $('.scaled').each(function() {

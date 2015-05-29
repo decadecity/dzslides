@@ -1,53 +1,53 @@
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 html, body {
-  height: 100%;
   color: white;
+  background-color: #EEE;
 }
 
 body {
+  height: 100vh;
+  margin: 0;
   font-family: sans-serif;
   overflow: hidden;
 }
 
 #present, #future {
-  bottom: 234px;
+  right: 0;
   position: absolute;
+  width: 50vw;
+  height: 50vh;
   top: 0;
   z-index: 5;
+  border-left: 8px solid #555;
 }
 
 #present {
-  left: 0;
-  right: 50%;
-  border-right: 4px solid #555;
+  border-bottom: 4px solid #555;
 }
 
 #future {
-  left: 50%;
-  right: 0;
-  border-left: 4px solid #555;
+  top: 50vh;
+  border-top: 4px solid #555;
 }
 
+
 #notes {
-  border-top: 8px solid #555;
-  bottom: 0;
+  top: 0;
   color: #444;
   font-size: 30px;
-  height: 226px;
   left: 0;
-  padding: 0 250px 0 20px;
+  top: 0;
+  height: 100vh;
+  width: 50vw;
   position: absolute;
-  right: 0;
-  overflow: auto;
-  background: repeating-linear-gradient(
-    -55deg,
-    #FDD,
-    #FDD 20px,
-    #EEE 20px,
-    #EEE 40px
-  );
-}
-#notes:focus {
-  background: #EEE;
+  padding: 50px 0;
 }
 
 #time {
@@ -89,34 +89,34 @@ iframe {
 #slideidx,
 #nextslideidx {
   border-bottom: 4px solid #555;
-  bottom: 230px;
+  border-right: 4px solid #555;
+  bottom: 50vh;
   padding: 0 10px;
 }
 
 #slideidx {
-  border-right: 4px solid #555;
-  border-top-left-radius: 10px;
+  border-bottom-right-radius: 10px;
   cursor: pointer;
-  right: 50%;
+  left: 50vw;
+  top: 0;
 }
 
 #nextslideidx {
-  border-left: 4px solid #555;
-  border-top-right-radius: 10px;
-  left: 50%;
+  border-bottom-right-radius: 10px;
+  left: 50vw;
+  top: 50vh;
 }
 
 #slidecount {
   border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  border-top: 4px solid #555;
-  bottom: 174px;
+  border: 4px solid #555;
+  border-top: none;
   width: 200px;
-  right: 30px;
+  right: 50vw;
+  top: 0;
 }
 
 #popup-button {
-  bottom: 88px;
   background: #888;
   border: none;
   border-radius: 10px;
@@ -126,7 +126,25 @@ iframe {
   font-size: 30px;
   font-weight: bold;
   position: absolute;
-  right: 30px;
+  right: 50vw;
+  bottom: 0;
   width: 200px;
   z-index: 10;
+}
+
+#content {
+  overflow-y: auto;
+  height: 100%;
+  padding: 0 1em;
+  background: repeating-linear-gradient(
+    -55deg,
+    #FDD,
+    #FDD 20px,
+    #EEE 20px,
+    #EEE 40px
+  );
+}
+
+#content:focus {
+  background: #EEE;
 }

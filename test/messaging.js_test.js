@@ -20,10 +20,43 @@
 
 module('Messaging');
 
-QUnit.test( 'Messaging exists', function(assert) {
+QUnit.test('Messaging exists', function(assert) {
   assert.equal(
     typeof window.DCslides.messaging,
     'object',
     'Module is an object.'
   );
 });
+
+QUnit.test('Triggers an event', function(assert) {
+  assert.equal(
+    typeof window.DCslides.messaging.sendEvent,
+    'function',
+    'Method exists'
+  );
+  assert.equal(
+    typeof window.DCslides.messaging.event_source,
+    'object',
+    'Event source exists'
+  );
+
+  var triggered = false;
+  window.DCslides.messaging.event_source.on('foo', function() {
+    triggered = true;
+  });
+  window.DCslides.messaging.sendEvent('foo');
+  assert.strictEqual(
+    triggered,
+    true,
+    'Triggers an event'
+  );
+});
+
+QUnit.test('Sends a message', function(assert) {
+  assert.equal(
+    typeof window.DCslides.messaging.message,
+    'function',
+    'Method exists'
+  );
+});
+
