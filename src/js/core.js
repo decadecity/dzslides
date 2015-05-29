@@ -350,6 +350,9 @@ Dz.postMsg = function(win, message) { // [arg0, [arg1...]]
 Dz.sendEvent = function(type, data) {
   // This isn't using new CustomEvent('keydown') due to a webkit bug in phantom.
   // https://github.com/ariya/phantomjs/issues/11289
+  data = {
+    'detail': data
+  };
   if (window.CustomEvent) {
     document.dispatchEvent(new window.CustomEvent(type, data));
   } else {
