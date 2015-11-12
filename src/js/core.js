@@ -188,7 +188,7 @@ Dz.toggleContent = function() {
   if (slide.length) {
     var video = slide.find("video");
     // Don't know if this works
-    if (video) {
+    if (video.length) {
       if (video.ended || video.paused) {
         video.play();
       } else {
